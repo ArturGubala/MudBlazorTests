@@ -1,0 +1,108 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor.Services
+
+<MudThemeProvider Theme="_currentTheme" @bind-IsDarkMode="@_isDarkMode" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Dense="@dense">
+        <MudIconButton Icon="@(open ? @Icons.Material.Filled.MenuOpen : Icons.Material.Filled.Menu)" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudSpacer />
+        <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" ThumbIcon="@(_isDarkMode ? @Icons.Material.Filled.LightMode : @Icons.Material.Filled.DarkMode)" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@open" ClipMode="clipMode" Breakpoint="@breakpoint" PreserveOpenState="@preserveOpenState" Elevation="1" Variant="@variant" OpenMiniOnHover="true">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    [Inject] IBreakpointService BreakpointListener { get; set; }
+
+    bool open = false;
+    bool dense = true;
+    bool preserveOpenState = false;
+    Breakpoint breakpoint = Breakpoint.Md;
+    DrawerClipMode clipMode = DrawerClipMode.Never;
+    DrawerVariant variant = DrawerVariant.Mini;
+    string menuIcon = Icons.Material.Filled.Menu;
+    private bool _isDarkMode;
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Breakpoint breakpoint = await BreakpointListener.GetBreakpoint();
+        SetDrawerVariant(breakpoint);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await BreakpointListener.Subscribe(breakpoint =>
+            {
+                SetDrawerVariant(breakpoint);
+                InvokeAsync(StateHasChanged);
+            });
+
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private readonly MudTheme _currentTheme = new()
+        {
+            //Palette = new Palette
+            //{
+            //    Primary = "#1489ca",
+            //    Secondary = "#4CAF50",
+            //    Info = "#64a7e2",
+            //    Success = "#2ECC40",
+            //    Warning = "#FFC107",
+            //    Error = "#FF0000",
+            //    AppbarBackground = "#1489ca",
+            //}
+        };
+
+    private void SetDrawerVariant(Breakpoint breakpoint)
+    {
+        switch (breakpoint)
+        {
+            case Breakpoint.Xs:
+                variant = DrawerVariant.Responsive;
+                break;
+
+            case Breakpoint.Sm:
+                variant = DrawerVariant.Responsive;
+                break;
+
+            case Breakpoint.Md:
+                variant = DrawerVariant.Mini;
+                break;
+
+            case Breakpoint.Lg:
+                variant = DrawerVariant.Mini;
+                break;
+
+            case Breakpoint.Xl:
+                variant = DrawerVariant.Mini;
+                break;
+
+            default:
+                variant = DrawerVariant.Mini;
+                break;
+        }
+    }
+}
