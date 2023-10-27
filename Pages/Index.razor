@@ -1,7 +1,29 @@
 ﻿@page "/"
+@using MudBlazorTests.Shared.Dialogs;
+
+@inject IDialogService DialogService
+
 
 <PageTitle>Index</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
 <MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
 <MudAlert Severity="Severity.Normal">You can find documentation and examples on our website here: <MudLink Href="https://mudblazor.com" Typo="Typo.body2" Color="Color.Inherit"><b>www.mudblazor.com</b></MudLink></MudAlert>
+
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Info" Size="Size.Small" OnClick="OpenDialog">Save</MudButton>
+
+@code {
+    private void OpenDialog()
+    {
+        var options = new DialogOptions
+            {
+                FullWidth = true,
+                MaxWidth = MaxWidth.Large,
+                CloseButton = true,
+                DisableBackdropClick = true,
+                Position = DialogPosition.Center,
+                CloseOnEscapeKey = false,
+            };
+        DialogService.Show<AddDialog>("Dodaj użytkownika", options);
+    }
+}
